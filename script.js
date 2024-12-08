@@ -1,6 +1,7 @@
 window.addEventListener('DOMContentLoaded', () => {
     initializeForm();
     initializeEventListeners();
+    autoExecuteIfParamsExist();
 });
 
 function initializeForm() {
@@ -21,12 +22,7 @@ function initializeEventListeners() {
     form.addEventListener('input', () => updateURLParams(rankInput.value, countInput.value, isSort.checked, filtervalue.value));
 
     // ボタン押下時の処理
-    executeButton.addEventListener('click', async () => {
-        const data = await fetchCSVData('./data.csv');
-        if (!data) {
-            console.error("データの取得に失敗しました。");
-            return;
-        }
+    executeButton.addEventListener('click', executeTechniques);
 
         let techniques = getRandomTechniques(data, rankInput.value, countInput.value, filtervalue.value);
         if (isSort.checked) {
@@ -34,6 +30,25 @@ function initializeEventListeners() {
         }
         displayDataInTable(techniques, 'table');
     });
+}
+
+async function executeTechniques() {
+    const rankInput = document.getElementById('rank');
+    const countInput = document.getElementById('count');
+    const isSort = document.getElementById('sort');
+    const filtervalue = document.getElementById('filter');
+
+    const data = await fetchCSVData('./data.csv');
+    if (!data) {
+        console.error("データの取得に失敗しました。");
+        return;
+    }
+
+    let techniques = getRandomTechniques(data, rankInput.value, countInput.value, filtervalue.value);
+    if (isSort.checked) {
+        techniques = restoreOrder(data, techniques);
+    }
+    displayDataInTable(techniques, 'table');
 }
 
 async function fetchCSVData(path) {
@@ -60,7 +75,6 @@ function updateURLParams(rank, count, sort, filter) {
     newUrl.searchParams.set('filter', filter);
     window.history.replaceState(null, '', newUrl.toString());
 }
-
 
 function syncParamsWithURL() {
     const params = new URLSearchParams(window.location.search);
@@ -143,4 +157,10 @@ function restoreOrder(A, B) {
     return B.sort((a, b) => {
         return indexMap[a[0]] - indexMap[b[0]];
     });
+}
+function autoExecuteIfParamsExist() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('rank') && params.get('count') && params.get('sort') && params.get('filter')) {
+        executeTechniques();
+    }
 }
