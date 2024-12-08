@@ -53,3 +53,16 @@ th:nth-child(2), td:nth-child(2) {
 th:nth-child(3), td:nth-child(3) {
     width: 40px; /* 3列目の幅を固定 */
 }
+
+footer{
+    margin-top: 10px;
+    color: gray;
+}
+
+footer > p {
+    text-align: center;
+}
+
+footer > p > a {
+    color: cornflowerblue;
+}
