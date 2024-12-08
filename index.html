@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>審査技ジェネレーター</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js"></script>
+</head>
+<body>
+    <h1>審査技ジェネレーター</h1>
+    <p>選ばれた級段位の昇級・昇段審査で見られる技を出力します</p>
+    <p>出力数がデータの数を上回った場合は，全てが出力されます</p>
+    <form id="form">
+        <label for="rank">
+        級段位
+        </label>
+        <select id="rank" name="rank">
+            <option value="5">5級</option>
+            <option value="3">3級</option>
+            <option value="1">1級</option>
+            <option value="-1">初段</option>
+        </select>
+
+        <br />
+
+        <label for="count">
+            出力数
+        </label>
+        <input id="count" name="count" type="number" min="1" required />
+        <input id="exe" type="button" class="btn" value="実行" />
+    </form>
+    <table id="table">
+        <thead>
+            <tr>
+                <th>NO．</th>
+                <th>技</th>
+                <th>級段位</th>
+            </tr>
+        </thead>
+    </table>
+</body>

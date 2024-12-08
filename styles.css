@@ -1,0 +1,46 @@
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 1200px;
+  background-color: #e4ebee;
+}
+
+#form {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+
+label {
+    width: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    table-layout: fixed; /* 列幅を固定 */
+}
+
+thead {
+    border-bottom: 1px solid #ccd6da;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    word-wrap: break-word; /* 内容が長い場合に折り返す */
+}
+
+th:nth-child(1), td:nth-child(1) {
+    width: 50px; /* 1列目の幅を固定 */
+}
+
+th:nth-child(2), td:nth-child(2) {
+    width: 150px; /* 2列目の幅を固定 */
+}
+
+th:nth-child(3), td:nth-child(3) {
+    width: 100px; /* 3列目の幅を固定 */
+}
