@@ -14,7 +14,7 @@
     </details>
     <form id="form">
         <label for="rank">
-        級段位
+            級段位
         </label>
         <select id="rank" name="rank">
             <option value="5">5級</option>
@@ -28,20 +28,18 @@
             <option value="only">のみ</option>
             <option value="over">以上</option>
         </select>
-
         <br />
-
         <label for="count">
             出力数
         </label>
         <input id="count" name="count" type="number" min="1" required />
+        <input id="exe" type="button" class="btn" value="実行" />
         <br />
+
         <input type="checkbox" id="sort" name="sort" />
         <label for="sort">
             ソートして表示
         </label>
-        <br />
-        <input id="exe" type="button" class="btn" value="実行" />
     </form>
     <table id="table">
         <thead>
