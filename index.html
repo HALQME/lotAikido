@@ -23,12 +23,24 @@
             <option value="-1">初段</option>
         </select>
 
+        <select id="filter" name="filter">
+            <option value="under">以下</option>
+            <option value="onle">のみ</option>
+            <option value="over">以上</option>
+        </select>
+
         <br />
 
         <label for="count">
             出力数
         </label>
         <input id="count" name="count" type="number" min="1" required />
+        <br />
+        <input type="checkbox" id="sort" name="sort" />
+        <label for="sort">
+            ソートして表示
+        </label>
+        <br />
         <input id="exe" type="button" class="btn" value="実行" />
     </form>
     <table id="table">
