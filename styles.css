@@ -1,13 +1,14 @@
 body {
   font-family: Arial, sans-serif;
   line-height: 1.6;
-  margin: 0 auto;
-  max-width: 1200px;
+  margin: 2% auto;
+  padding: 0 2%;
   background-color: #e4ebee;
+  max-width: 1050px;
+  min-width: 350px;
 }
 
 #form {
-  width: 300px;
   flex-shrink: 0;
 }
 
@@ -23,6 +24,14 @@ table {
     table-layout: fixed; /* 列幅を固定 */
 }
 
+p {
+    margin-block: 0;
+}
+
+details {
+    margin-bottom: 4%;
+}
+
 thead {
     border-bottom: 1px solid #ccd6da;
 }
@@ -34,7 +43,7 @@ th, td {
 }
 
 th:nth-child(1), td:nth-child(1) {
-    width: 50px; /* 1列目の幅を固定 */
+    width: 30px; /* 1列目の幅を固定 */
 }
 
 th:nth-child(2), td:nth-child(2) {
@@ -42,5 +51,5 @@ th:nth-child(2), td:nth-child(2) {
 }
 
 th:nth-child(3), td:nth-child(3) {
-    width: 100px; /* 3列目の幅を固定 */
+    width: 40px; /* 3列目の幅を固定 */
 }
