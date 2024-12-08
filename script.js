@@ -24,11 +24,13 @@ function initializeEventListeners() {
     // ボタン押下時の処理
     executeButton.addEventListener('click', executeTechniques);
 
-        let techniques = getRandomTechniques(data, rankInput.value, countInput.value, filtervalue.value);
-        if (isSort.checked) {
-            techniques = restoreOrder(data, techniques);
+    isSort.addEventListener('change', async () => {
+        const data = await fetchCSVData('./data.csv');
+        if (!data) {
+            console.error("データの取得に失敗しました。");
+            return;
         }
-        displayDataInTable(techniques, 'table');
+       updateTable(isSort, data);
     });
 }
 
@@ -60,6 +62,20 @@ async function fetchCSVData(path) {
     } catch (error) {
         console.error("CSVファイルの読み込み中にエラーが発生:", error);
         return null;
+    }
+}
+
+async function updateTable(isSort, data) {
+    const tableData = Array.from(document.querySelectorAll('#table tbody tr')).map(row =>
+        Array.from(row.children).map(cell => cell.textContent)
+    ).map(row => row.toSpliced(0, 1));
+
+    if (isSort.checked) {
+        const sortedData = restoreOrder(data, tableData);
+        displayDataInTable(sortedData, 'table');
+    } else {
+        const shuffledData = shuffleArray(tableData);
+        displayDataInTable(shuffledData, 'table');
     }
 }
 
@@ -158,6 +174,15 @@ function restoreOrder(A, B) {
         return indexMap[a[0]] - indexMap[b[0]];
     });
 }
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
 function autoExecuteIfParamsExist() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('rank') && params.get('count') && params.get('sort') && params.get('filter')) {
