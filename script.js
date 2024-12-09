@@ -17,29 +17,38 @@ function initializeEventListeners() {
     const countInput = document.getElementById('count');
     const isSort = document.getElementById('sort');
     const filtervalue = document.getElementById('filter');
+    const buttons = document.querySelectorAll('.observed');
 
     // フォームの値変更時に URL を更新
-    form.addEventListener('input', () => updateURLParams(rankInput.value, countInput.value, isSort.checked, filtervalue.value));
+    form.addEventListener('input', () =>
+        updateURLParams(rankInput.value, countInput.value, isSort.checked, filtervalue.value, disable_dup.checked));
 
     // ボタン押下時の処理
     executeButton.addEventListener('click', executeTechniques);
 
-    isSort.addEventListener('change', async () => {
-        const data = await fetchCSVData('./data.csv');
-        if (!data) {
-            console.error("データの取得に失敗しました。");
-            return;
-        }
-       updateTable(isSort, data);
+    buttons.forEach(button => {
+        button.addEventListener('click', async () => {
+            const data = await fetchCSVData('./data.csv');
+            if (!data) {
+                console.error("データの取得に失敗しました。");
+                return;
+            }
+           updateTable('table', isSort, disable_dup, data);
+        });
     });
+
     document.getElementById("clearHistoryBtn").addEventListener("click", clearHistory);
+    document.getElementById("clearTableBtn").addEventListener("click", clearTable);
+
 }
 
 async function executeTechniques() {
+    saveHistory();
     const rankInput = document.getElementById('rank');
     const countInput = document.getElementById('count');
     const isSort = document.getElementById('sort');
     const filtervalue = document.getElementById('filter');
+    const disable_dup = document.getElementById('disable_dup');
 
     const data = await fetchCSVData('./data.csv');
     if (!data) {
@@ -47,11 +56,9 @@ async function executeTechniques() {
         return;
     }
 
-    let techniques = getRandomTechniques(data, rankInput.value, countInput.value, filtervalue.value);
-    if (isSort.checked) {
-        techniques = restoreOrder(data, techniques);
-    }
-    displayDataInTable(techniques, 'table');
+    let techniques = getRandomTechniques(data, rankInput.value, countInput.value, filtervalue.value, disable_dup);
+
+    updateTable('table', isSort, disable_dup, data)
 }
 
 async function fetchCSVData(path) {
@@ -66,76 +73,22 @@ async function fetchCSVData(path) {
     }
 }
 
-async function updateTable(isSort, data) {
-    const tableData = Array.from(document.querySelectorAll('#table tbody tr')).map(row =>
-        Array.from(row.children).map(cell => cell.textContent)
-    ).map(row => row.toSpliced(0, 1));
+function updateTable(tableid, isSort, disable_dup, data) {
+    const tableData = restoreDataFromStorage(data);
 
     if (isSort.checked) {
         const sortedData = restoreOrder(data, tableData);
-        displayDataInTable(sortedData, 'table');
+        displayDataInTable(sortedData, tableid);
     } else {
-        const shuffledData = shuffleArray(tableData);
-        displayDataInTable(shuffledData, 'table');
-    }
-}
-
-function getCurrentTable(){
-    const sesItems = sessionStorageManager.getAllItem();
-}
-
-function parseCSV(csvText) {
-    return csvText.split(/\r?\n/).map(line => line.split(',')).filter(row => row.length > 1);
-}
-
-function updateURLParams(rank, count, sort, filter) {
-    const newUrl = new URL(window.location.href);
-    newUrl.searchParams.set('rank', rank);
-    newUrl.searchParams.set('count', count);
-    newUrl.searchParams.set('sort', sort);
-    newUrl.searchParams.set('filter', filter);
-    window.history.replaceState(null, '', newUrl.toString());
-}
-
-function syncParamsWithURL() {
-    const params = new URLSearchParams(window.location.search);
-    const rankParam = params.get('rank');
-    const countParam = params.get('count');
-    const sortParam = params.get('sort');
-    const filterParam = params.get('filter');
-    if (rankParam) document.getElementById('rank').value = rankParam;
-    if (countParam) document.getElementById('count').value = countParam;
-    if (sortParam) document.getElementById('sort').checked = sortParam === 'true';
-    if (filterParam) document.getElementById('filter').value = filterParam;
-}
-
-function getRandomTechniques(data, minLevel, count, filter) {
-    let filteredData;
-    switch (filter) {
-        case 'under':
-            filteredData = data.filter(row => Number(row[1]) >= Number(minLevel));
-            break;
-        case 'only':
-            filteredData = data.filter(row => Number(row[1]) == Number(minLevel));
-            break;
-        case 'over':
-            filteredData = data.filter(row => Number(row[1]) <= Number(minLevel));
-            break;
-        default:
-            filteredData = data;
+        displayDataInTable(tableData, tableid);
     }
 
-
-    for (let i = filteredData.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [filteredData[i], filteredData[j]] = [filteredData[j], filteredData[i]];
+    if (disable_dup.checked) {
+        const filteredData = filterReferenceData(localStorageManager.getAllItem(), tableData);
+        displayDataInTable(filteredData, tableid);
+    } else {
+        displayDataInTable(tableData, tableid);
     }
-
-    let returnData = filteredData.slice(0, Number(count));
-
-    saveHistory(returnData);
-
-    return returnData;
 }
 
 function displayDataInTable(data, tableId) {
@@ -154,6 +107,67 @@ function displayDataInTable(data, tableId) {
         });
         tbody.appendChild(tableRow);
     });
+}
+
+function getCurrentTable(){
+    const sesItems = sessionStorageManager.getAllItem();
+}
+
+function parseCSV(csvText) {
+    return csvText.split(/\r?\n/).map(line => line.split(',')).filter(row => row.length > 1);
+}
+
+function updateURLParams(rank, count, sort, filter, disable_dup) {
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set('rank', rank);
+    newUrl.searchParams.set('count', count);
+    newUrl.searchParams.set('sort', sort);
+    newUrl.searchParams.set('disable_dup', disable_dup)
+    newUrl.searchParams.set('filter', filter);
+    window.history.replaceState(null, '', newUrl.toString());
+}
+
+function syncParamsWithURL() {
+    const params = new URLSearchParams(window.location.search);
+    const rankParam = params.get('rank');
+    const countParam = params.get('count');
+    const sortParam = params.get('sort');
+    const filterParam = params.get('filter');
+    const disable_dup = document.getElementById('disable_dup');
+
+    if (rankParam) document.getElementById('rank').value = rankParam;
+    if (countParam) document.getElementById('count').value = countParam;
+    if (sortParam) document.getElementById('sort').checked = sortParam === 'true';
+    if (filterParam) document.getElementById('filter').value = filterParam;
+    if (disable_dup) document.getElementById('disable_dup').checked = disable_dup == 'true' ;
+}
+
+function getRandomTechniques(data, minLevel, count, filter, disable_dup) {
+    let filteredData;
+    switch (filter) {
+        case 'under':
+            filteredData = data.filter(row => Number(row[1]) >= Number(minLevel));
+            break;
+        case 'only':
+            filteredData = data.filter(row => Number(row[1]) == Number(minLevel));
+            break;
+        case 'over':
+            filteredData = data.filter(row => Number(row[1]) <= Number(minLevel));
+            break;
+        default:
+            filteredData = data;
+    }
+
+    for (let i = filteredData.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [filteredData[i], filteredData[j]] = [filteredData[j], filteredData[i]];
+    }
+
+    let returnData = filteredData.slice(0, Number(count));
+
+    saveTableCache(returnData);
+
+    return returnData;
 }
 
 function createTableCell(content) {
@@ -200,6 +214,34 @@ function autoExecuteIfParamsExist() {
     }
 }
 
+class localStorageManager {
+    constructor() {
+        this.lsAble =  window.localStorage ? true : false ;
+    }
+
+    static appendItems(items) {
+        const length = localStorage.length;
+        const seted_items = Array.from(new Set(items.concat(localStorageManager.getAllItem())));
+        seted_items.forEach( function( value, index ) {
+            const indexer = index + length ;
+            localStorage.setItem(indexer, value);
+        });
+    }
+
+    static getAllItem() {
+        let items = [];
+        const indexer = localStorage.length;
+        for (var i = 0; i < indexer; i += 1){
+            items.push(localStorage[i]);
+        }
+        return items;
+    }
+
+    static clearStrage() {
+        localStorage.clear();
+    }
+}
+
 class sessionStorageManager {
     constructor() {
         this.ssAble = window.sessionStorage ? true : false ;
@@ -227,11 +269,19 @@ class sessionStorageManager {
     }
 }
 
-function saveHistory(data){
+function saveTableCache(data){
     let stores = data.map(value => value[0]);
     sessionStorageManager.setItems(stores);
 }
 
+function saveHistory(){
+    const current = sessionStorageManager.getAllItem();
+    localStorageManager.appendItems(current);
+}
+
+function clearHistory() {
+    localStorageManager.clearStrage();
+}
 
 function clearTable() {
     sessionStorageManager.clearStrage();
@@ -251,4 +301,14 @@ function restoreDataFromStorage(csvData) {
         const reference = referenceMap.get(sesData);
         return [sesData, reference || null]; // 参照データがない場合はnull
     });
+}
+
+function filterReferenceData(techniquesToExclude, referenceData) {
+  // 除外する技名をSetで管理 (検索効率向上のため)
+  const excludeSet = new Set(techniquesToExclude);
+
+  // 参照データをフィルター
+  return referenceData.filter(([technique, value]) => {
+    return !excludeSet.has(technique);
+  });
 }
