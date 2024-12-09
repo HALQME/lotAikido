@@ -1,7 +1,7 @@
 body {
   font-family: Arial, sans-serif;
   line-height: 1.6;
-  margin: 2% auto;
+  /* margin: 2% auto; */
   padding: 0 2%;
   background-color: #4682b41c;
   max-width: 1050px;
@@ -14,9 +14,8 @@ form {
     border-radius: 8px;
 }
 
-
 label {
-    margin-bottom: 8px;
+     margin-bottom: 8px;
     font-weight: bold;
     font-size: 14px;
     color: #333;
@@ -33,6 +32,10 @@ select {
     border-radius: 4px;
     font-size: 16px;
     box-sizing: border-box;
+}
+
+input#count {
+    max-width: 100px;
 }
 
 input[type="text"],

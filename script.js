@@ -6,7 +6,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function initializeForm() {
     const count = document.getElementById('count');
-    count.value = 4; // 初期値設定
+    count.value = 10; // 初期値設定
     syncParamsWithURL(); // URL パラメータを反映
 }
 
