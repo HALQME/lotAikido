@@ -35,12 +35,16 @@
         <input id="count" name="count" type="number" min="1" required />
         <input id="exe" type="button" class="btn" value="実行" />
         <br />
-
-        <input type="checkbox" id="sort" name="sort" />
+        <input type="checkbox" id="disable_dup" name="disable_dup" class="observed" />
+        <label for="disable_dup">
+            既出の技を除外する
+        </label>
+        <input type="checkbox" id="sort" name="sort" class="observed" />
         <label for="sort">
             ソートして表示
         </label>
     </form>
+
     <table id="table">
         <thead>
             <tr>
@@ -50,6 +54,11 @@
             </tr>
         </thead>
     </table>
+
+    <div class="dataManage">
+        <input id="clearTableBtn" type="button" class="btn" value="現在のテーブルをクリア" />
+        <input id="clearHistoryBtn" type="button" class="btn" value="履歴をクリア" />
+    </div>
     <footer>
         <p>developed by <a href="https://github.com/halqme/">HALQME</a></p>
         <p>see repo on <a href="https://github.com/halqme/lotAikido">GitHub</a></p>
