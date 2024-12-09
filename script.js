@@ -32,6 +32,7 @@ function initializeEventListeners() {
         }
        updateTable(isSort, data);
     });
+    document.getElementById("clearHistoryBtn").addEventListener("click", clearHistory);
 }
 
 async function executeTechniques() {
@@ -79,6 +80,10 @@ async function updateTable(isSort, data) {
     }
 }
 
+function getCurrentTable(){
+    const sesItems = sessionStorageManager.getAllItem();
+}
+
 function parseCSV(csvText) {
     return csvText.split(/\r?\n/).map(line => line.split(',')).filter(row => row.length > 1);
 }
@@ -120,12 +125,17 @@ function getRandomTechniques(data, minLevel, count, filter) {
             filteredData = data;
     }
 
+
     for (let i = filteredData.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [filteredData[i], filteredData[j]] = [filteredData[j], filteredData[i]];
     }
 
-    return filteredData.slice(0, Number(count));
+    let returnData = filteredData.slice(0, Number(count));
+
+    saveHistory(returnData);
+
+    return returnData;
 }
 
 function displayDataInTable(data, tableId) {
@@ -188,4 +198,57 @@ function autoExecuteIfParamsExist() {
     if (params.get('rank') && params.get('count') && params.get('sort') && params.get('filter')) {
         executeTechniques();
     }
+}
+
+class sessionStorageManager {
+    constructor() {
+        this.ssAble = window.sessionStorage ? true : false ;
+    }
+
+    static setItems(items) {
+        this.clearStrage();
+        items.forEach( function( value, index ) {
+            const indexer = index;
+            sessionStorage.setItem(indexer, value);
+        });
+    }
+
+    static getAllItem() {
+        let items = [];
+        const indexer = sessionStorage.length;
+        for (var i = 0; i < indexer; i += 1){
+            items.push(sessionStorage[i]);
+        }
+        return items;
+    }
+
+    static clearStrage() {
+        sessionStorage.clear();
+    }
+}
+
+function saveHistory(data){
+    let stores = data.map(value => value[0]);
+    sessionStorageManager.setItems(stores);
+}
+
+
+function clearTable() {
+    sessionStorageManager.clearStrage();
+
+    const tableBody = document.querySelector("#table tbody");
+    tableBody.innerHTML = "";
+}
+
+function restoreDataFromStorage(csvData) {
+    const sesData = sessionStorageManager.getAllItem();
+    const restoredData = csvData.filter(row => row.some(value => sesData.includes(value)));
+
+    const referenceMap = new Map(restoredData);
+
+    // 入力データをキーとしてソートし、参照データを取得
+    return sesData.map(sesData => {
+        const reference = referenceMap.get(sesData);
+        return [sesData, reference || null]; // 参照データがない場合はnull
+    });
 }

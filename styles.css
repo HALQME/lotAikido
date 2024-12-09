@@ -40,7 +40,7 @@ input[type="number"],:focus{
     outline-color: steelblue;
 }
 
-input#exe {
+.btn {
     padding: 9px 20px;
     margin-bottom: 15px;
     background-color: #c9c9c961;
@@ -51,7 +51,11 @@ input#exe {
     box-sizing: border-box;
 }
 
-input#exe:active {
+.dataManage > .btn {
+    margin-top: 40px;
+}
+
+.btn:active {
     box-shadow: inset 2px 2px 0 0px steelblue;
     background-color: #c9c9c99c;
 }
@@ -62,7 +66,7 @@ input[type="checkbox"] + label {
   display: block;
   position: relative;
   padding-left: 35px;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
