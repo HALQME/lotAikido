@@ -1,0 +1,115 @@
+<form id="form">
+    <section>
+        <select id="rank" name="rank">
+            <option value="5">5級</option>
+            <option value="3">3級</option>
+            <option value="1">1級</option>
+            <option value="-1">初段</option>
+        </select>
+
+        <select id="filter" name="filter">
+            <option value="under">以下</option>
+            <option value="only">のみ</option>
+            <option value="over">以上</option>
+        </select>
+        <input id="count" name="count" type="number" min="1" required />
+        <label for="count"> 個 </label>
+        <input id="shuffle" type="button" class="btn" value="シャッフル" />
+    </section>
+</form>
+
+<style>
+    form {
+        max-width: 600px;
+        margin: 20px;
+        border-radius: 8px;
+    }
+
+    label {
+        margin-bottom: 8px;
+        font-weight: bold;
+        font-size: 14px;
+        color: #333;
+        min-width: 60px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+        width: auto;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    input#count {
+        max-width: 100px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    :focus {
+        outline-color: var(--accent-color);
+    }
+
+    .btn {
+        padding: 9px 20px;
+        margin-bottom: 15px;
+        background-color: #c9c9c961;
+        border: 1px solid var(--accent-color);
+        box-shadow: 1px 1px 0 0px var(--accent-color);
+        border-radius: 4px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    .dataManage > .btn {
+        margin-top: 40px;
+    }
+
+    .btn:active {
+        box-shadow: inset 2px 2px 0 0px var(--accent-color);
+        background-color: #c9c9c99c;
+    }
+</style>
+
+<script>
+    // 出力ボタンをクリックしたときの処理
+    // // フォームの内容を取得して、URLパラメータとして付与
+    import { getParams } from "../assets/param";
+
+    window.addEventListener("change", () => {
+        updateParam();
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+        referParam();
+    });
+
+    function updateParam() {
+        const countInput = document.getElementById("count") as HTMLInputElement;
+        const rankInput = document.getElementById("rank") as HTMLInputElement;
+        const filtervalue = document.getElementById(
+            "filter"
+        ) as HTMLInputElement;
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set("rank", rankInput.value);
+        newUrl.searchParams.set("count", countInput.value);
+        newUrl.searchParams.set("filter", filtervalue.value);
+        window.history.replaceState(null, "", newUrl.toString());
+    }
+
+    function referParam() {
+        const params = getParams();
+        const countInput = document.getElementById("count") as HTMLInputElement;
+        const rankInput = document.getElementById("rank") as HTMLInputElement;
+        const filtervalue = document.getElementById(
+            "filter"
+        ) as HTMLInputElement;
+        countInput.value = params.count || "10";
+        rankInput.value = params.rank || "5";
+        filtervalue.value = params.filter || "under";
+    }
+</script>

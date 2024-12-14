@@ -1,0 +1,26 @@
+---
+import TagInput from "./TagInput.astro";
+import Checkbox from "./Checkbox.astro";
+---
+
+<div class="detailsbox">
+    <div class="checkbox">
+        <!-- <Checkbox name="disable_dup" disc="既出の技を除く" /> -->
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <Checkbox name="sort" disc="ソート" />
+    </div>
+    <TagInput type="positive" label="包含キーワードを入力" />
+    <TagInput type="negative" label="除外キーワードを入力" />
+</div>
+
+<style>
+    .checkbox {
+        margin-bottom: 10px;
+        display: flex;
+    }
+
+    .detailsbox {
+        margin-top: 0.2rem;
+        margin-left: 1rem;
+    }
+</style>

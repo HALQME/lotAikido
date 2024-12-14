@@ -1,0 +1,185 @@
+---
+interface Props {
+    label?: string;
+    type: "positive" | "negative";
+    color?: string;
+}
+
+const {
+    label = "タグを入力",
+    type,
+    color = type === "positive" ? "#5f9ea0" : "#cd5c5c",
+} = Astro.props;
+---
+
+<astro-tag-input data-type={type} color={color} label={label}>
+    <div class="tag-input-container" data-type={type}>
+        <div class="input-area">
+            <input type="text" class="tag-input" placeholder={label} />
+            <button class="add-button">追加</button>
+        </div>
+        <div class="tags-area"></div>
+    </div>
+</astro-tag-input>
+
+<style define:vars={{ tagColor: color }}>
+    .tag-input-container {
+        width: 80%;
+        max-width: 100%;
+        margin: 0 0 0.9rem 0;
+    }
+
+    .input-area {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .tag-input {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .add-button {
+        padding: 0.5rem 1rem;
+        background-color: var(--tagColor);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .tags-area {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+</style>
+
+<script>
+    class TagManager {
+        container: HTMLElement;
+        input: HTMLInputElement;
+        addButton: HTMLButtonElement;
+        tagsArea: HTMLDivElement;
+        type: string | undefined;
+
+        constructor(container: HTMLElement) {
+            this.container = container;
+            this.input = container.querySelector(
+                ".tag-input"
+            ) as HTMLInputElement;
+            this.addButton = container.querySelector(
+                ".add-button"
+            ) as HTMLButtonElement;
+            this.tagsArea = container.querySelector(
+                ".tags-area"
+            ) as HTMLDivElement;
+            this.type = container.dataset.type;
+
+            this.setupEventListeners();
+        }
+
+        setupEventListeners() {
+            this.addButton.addEventListener("click", () =>
+                this.addTag(this.input.value.trim())
+            );
+            this.input.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    this.addTag(this.input.value.trim());
+                }
+            });
+        }
+
+        addTag(text: string) {
+            if (!text) return;
+
+            // Check if the tag already exists
+            const existingTags = Array.from(
+                this.tagsArea.querySelectorAll(".text-value")
+            ).map((el) => el.textContent?.trim());
+            if (existingTags.includes(text)) {
+                return;
+            }
+
+            const tag = document.createElement("span");
+            tag.innerHTML = `
+                <div class="tag" style="padding: 1px 10px; border: 1px solid var(--tagColor); border-radius: 4px; background-color: rgba(var(--tagColor), 0.4);"><span class="text-value">${text}</span><span class="tag-delete" style="margin-left: 5px;"> ×</span></div>
+            `;
+
+            tag.querySelector(".tag-delete")?.addEventListener("click", () => {
+                tag.remove();
+            });
+
+            this.tagsArea.appendChild(tag);
+            this.input.value = "";
+        }
+    }
+
+    // 全てのタグ入力コンテナを初期化
+    document.querySelectorAll(".tag-input-container").forEach((container) => {
+        new TagManager(container as HTMLElement);
+    });
+    // カスタム要素の定義
+    class AstroTagInput extends HTMLElement {
+        private tags: string[];
+        private tagsArea: HTMLElement;
+        private type: string;
+
+        constructor() {
+            super();
+            this.tags = [];
+            this.tagsArea = this.querySelector(".tags-area") as HTMLElement;
+            this.type = this.getAttribute("data-type") as string;
+            this.setupObserver();
+            window.addEventListener("DOMContentLoaded", () => {
+                this.connectedCallback();
+            });
+        }
+
+        setupObserver() {
+            const observer = new MutationObserver(() => {
+                this.updateTagsArray();
+            });
+            observer.observe(this.tagsArea, { childList: true, subtree: true });
+        }
+
+        updateTagsArray() {
+            this.tags = Array.from(
+                this.tagsArea.querySelectorAll(".text-value")
+            ).map((el) => el.textContent?.trim() ?? "");
+            this.updateURL();
+        }
+
+        updateURL() {
+            const params = new URLSearchParams(window.location.search);
+            params.set(this.type, this.tags.join(","));
+            history.replaceState(
+                {},
+                "",
+                `${location.pathname}?${params.toString()}`
+            );
+        }
+
+        connectedCallback() {
+            const params = new URLSearchParams(window.location.search);
+            const tagString = params.get(this.type);
+            // 一旦現在あるタグ要素をすべて削除
+            this.tagsArea.innerHTML = "";
+            if (tagString) {
+                const tags = tagString.split(",");
+                const container = this.querySelector(
+                    ".tag-input-container"
+                ) as HTMLElement;
+                container.dataset.type = this.type; // Set data-type based on type
+                const manager = new TagManager(container);
+                tags.forEach((tag) => manager.addTag(tag));
+            }
+        }
+    }
+
+    customElements.define("astro-tag-input", AstroTagInput);
+</script>

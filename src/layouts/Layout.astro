@@ -1,0 +1,38 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<!doctype html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.9" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="canonical" href="https://omu-aikido.github.io/lot" />
+        <meta name="generator" content={Astro.generator} />
+        <script></script>
+        <title>審査技ジェネレーター</title>
+    </head>
+    <body>
+        <Header />
+        <slot />
+        <Footer />
+    </body>
+</html>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 2% auto;
+        padding: 0 2%;
+        background-color: #4682b41c;
+        --foreground-color: #333;
+        --light-dark: #595959;
+        --darker: #444;
+        --accent-color: steelblue;
+        max-width: 1050px;
+        min-width: 420px;
+    }
+</style>

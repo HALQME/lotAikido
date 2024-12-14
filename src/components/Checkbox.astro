@@ -1,0 +1,65 @@
+---
+interface Props {
+    name: string;
+    disc: string;
+}
+
+const { name, disc } = Astro.props;
+---
+
+<astro-checkbox data-name={name}>
+    <div class="checkbox">
+        <input type="checkbox" id={name} name={name} />
+        <label for={name}>{disc}</label>
+    </div>
+</astro-checkbox>
+
+<style>
+    input[type="checkbox"] {
+        position: relative;
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--accent-color);
+        vertical-align: -5px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    input[type="checkbox"]:checked:before {
+        position: absolute;
+        left: 3px;
+        transform: rotate(50deg);
+        width: 4px;
+        height: 8px;
+        border-right: 2px solid var(--accent-color);
+        border-bottom: 2px solid var(--accent-color);
+        content: "";
+    }
+</style>
+
+<script>
+    class AstroCheckbox extends HTMLElement {
+        constructor() {
+            super();
+            const checkbox = this.querySelector('input[type="checkbox"]')!;
+            const parm_name: string = this.dataset.name!;
+            checkbox.addEventListener("change", (e) => {
+                const url = new URL(window.location.href);
+                const target = e.target as HTMLInputElement;
+                if (target && target.checked) {
+                    url.searchParams.set(parm_name, "true");
+                } else {
+                    url.searchParams.set(parm_name, "false");
+                }
+                window.history.pushState({}, "", url);
+            });
+
+            const params = new URLSearchParams(window.location.search);
+            const status = params.get(parm_name);
+            if (status)
+                (checkbox as HTMLInputElement).checked = status === "true";
+        }
+    }
+    customElements.define("astro-checkbox", AstroCheckbox);
+</script>

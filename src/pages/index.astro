@@ -1,0 +1,62 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Execute from "../components/Excute.astro";
+import Filter from "../components/Filter.astro";
+import Table from "../components/Table.astro";
+---
+
+<Layout>
+    <Execute />
+    <Filter />
+    <Table />
+</Layout>
+
+<script>
+    import { createTable } from "../assets/table";
+    // 最初に実行する
+    window.addEventListener("DOMContentLoaded", () => {
+        watchURLParams();
+    });
+
+    // URLの変更を監視する関数
+    function watchURLParams() {
+        // pushStateとreplaceStateをオーバーライド
+        const originalPushState = history.pushState;
+        const originalReplaceState = history.replaceState;
+
+        history.pushState = function () {
+            originalPushState.apply(this, [
+                arguments[0],
+                arguments[1],
+                arguments[2],
+            ]);
+            console.log(
+                "pushStateによる変更:",
+                new URLSearchParams(window.location.search)
+            );
+            createTable();
+        };
+
+        history.replaceState = function () {
+            originalReplaceState.apply(this, [
+                arguments[0],
+                arguments[1],
+                arguments[2],
+            ]);
+            console.log(
+                "replaceStateによる変更:",
+                new URLSearchParams(window.location.search)
+            );
+            createTable();
+        };
+
+        // popstateイベントのリスナーを追加
+        window.addEventListener("popstate", () => {
+            console.log(
+                "popstateイベント:",
+                new URLSearchParams(window.location.search)
+            );
+            createTable();
+        });
+    }
+</script>
