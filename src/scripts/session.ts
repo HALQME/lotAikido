@@ -1,4 +1,4 @@
-import { wazadata } from "./data.ts";
+import { wazadata } from "../assets/data.ts";
 
 export class localStorageManager {
     lsAble: boolean;
