@@ -95,6 +95,7 @@ const {
         }
 
         addTag(text: string) {
+            text = text.replace(/<[^>]*>?/gm, "").trim();
             if (!text) return;
 
             // Check if the tag already exists
