@@ -9,7 +9,50 @@ import Table from "../components/Table.astro";
     <Execute />
     <Filter />
     <Table />
+    <div class="dataManage">
+        <div class="button-grid">
+            <!-- <input
+                id="viewHistoryBtn"
+                type="button"
+                class="btn"
+                value="履歴を表示"
+            /> -->
+            <input
+                id="shareTableBtn"
+                type="button"
+                class="btn"
+                value="リストを共有"
+            />
+        </div>
+    </div>
 </Layout>
+
+<style>
+    .dataManage {
+        margin-top: 20px;
+        text-align: end;
+        margin-right: 10%;
+    }
+
+    .btn {
+        text-decoration: none;
+        color: black;
+        padding: 9px 20px;
+        background-color: #eaf1f5;
+        border: 1px solid var(--accent-color);
+        box-shadow: 1px 1px 0 0px var(--accent-color);
+        border-radius: 4px;
+        font-size: 16px;
+        box-sizing: border-box;
+        height: 38px;
+        width: 140px;
+    }
+
+    .btn:active {
+        box-shadow: inset 2px 2px 0 0px var(--accent-color);
+        background-color: #eaf1f5;
+    }
+</style>
 
 <script>
     import { createTable } from "../scripts/table";
