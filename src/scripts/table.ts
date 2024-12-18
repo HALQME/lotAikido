@@ -1,4 +1,4 @@
-import { wazadata } from "./data.ts";
+import { wazadata } from "../assets/data.ts";
 import { localStorageManager, storage } from "./session.ts";
 import { Random } from "./random.ts";
 import { seed, setSeed, genSeed } from "./seed.ts";
