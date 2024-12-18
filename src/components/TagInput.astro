@@ -15,7 +15,12 @@ const {
 <astro-tag-input data-type={type} color={color} label={label}>
     <div class="tag-input-container" data-type={type}>
         <div class="input-area">
-            <input type="text" class="tag-input" placeholder={label} />
+            <input
+                type="text"
+                class="tag-input"
+                id={label}
+                placeholder={label}
+            />
             <button class="add-button">追加</button>
         </div>
         <div class="tags-area"></div>
